@@ -30,7 +30,7 @@ import com.hjozaty.app.presentation.theme.Warning
 @Composable fun HRatingBar(rating: Double, reviews: Int? = null) = Text("★ ${String.format("%.1f", rating)}${reviews?.let { " ($it)" } ?: ""}", color = Warning, style = MaterialTheme.typography.bodyMedium)
 
 /** Consistent Iraqi-dinar price treatment. */
-@Composable fun HPriceTag(price: Int, modifier: Modifier = Modifier) = Column(modifier, horizontalAlignment = Alignment.End) { Text("${price / 1000} ألف", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold); Text("د.ع / ليلة", color = MutedText, style = MaterialTheme.typography.bodyMedium) }
+@Composable fun HPriceTag(price: Long, modifier: Modifier = Modifier) = Column(modifier, horizontalAlignment = Alignment.End) { Text("${price / 1000} ألف", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold); Text("د.ع / ليلة", color = MutedText, style = MaterialTheme.typography.bodyMedium) }
 
 /** Consistent section heading with optional actionable label. */
 @Composable fun HSectionTitle(title: String, action: String? = null, onActionClick: (() -> Unit)? = null) = Row(Modifier.fillMaxWidth().padding(horizontal = HSpacing.lg, vertical = HSpacing.xs), verticalAlignment = Alignment.CenterVertically) { Text(title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f)); action?.let { Text(it, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold) } }
