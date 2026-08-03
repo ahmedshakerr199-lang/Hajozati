@@ -4,13 +4,24 @@ import 'package:hajozati/features/hotels/data/repositories/mock_hotel_repository
 import 'package:hajozati/features/hotels/domain/entities/hotel.dart';
 
 void main() {
-  test('approved provinces are exactly eighteen with no Halabja', () {
+  test('approved provinces are exactly eighteen', () {
     expect(MockHotelDataSource.provinces, hasLength(18));
-    expect(MockHotelDataSource.provinces.any((item) => item.id == 'halabja'), isFalse);
+    expect(MockHotelDataSource.provinces.map((item) => item.id), containsAll(<String>[
+      'baghdad', 'basra', 'nineveh', 'erbil', 'sulaymaniyah', 'duhok',
+      'kirkuk', 'anbar', 'salah-al-din', 'diyala', 'wasit', 'maysan',
+      'dhi-qar', 'muthanna', 'qadisiyah', 'babil', 'karbala', 'najaf',
+    ]));
   });
-  test('hotel amenities contain no Spa', () {
-    expect(HotelAmenity.values.any((item) => item.name == 'spa'), isFalse);
-    expect(MockHotelDataSource.hotels().every((hotel) => !hotel.amenities.any((item) => item.name == 'spa')), isTrue);
+  test('hotel amenities use only approved services', () {
+    const approved = <HotelAmenity>{
+      HotelAmenity.wifi, HotelAmenity.parking, HotelAmenity.pool,
+      HotelAmenity.restaurant, HotelAmenity.gym, HotelAmenity.roomService,
+      HotelAmenity.reception24h, HotelAmenity.airConditioning,
+      HotelAmenity.elevator, HotelAmenity.airportShuttle,
+      HotelAmenity.familyFriendly, HotelAmenity.generator,
+      HotelAmenity.housekeeping, HotelAmenity.accessible,
+    };
+    expect(MockHotelDataSource.hotels().every((hotel) => hotel.amenities.every(approved.contains)), isTrue);
   });
   test('loads details and similar hotels from the same province', () async {
     final repository = MockHotelRepository();
