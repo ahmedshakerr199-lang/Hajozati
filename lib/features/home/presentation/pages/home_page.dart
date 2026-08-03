@@ -1,126 +1,23 @@
 import 'package:flutter/material.dart';
-
 import '../../../../core/theme/app_colors.dart';
-import '../../../../shared/widgets/section_title.dart';
-import '../../data/datasources/hotel_local_data_source.dart';
-import '../widgets/hotel_card.dart';
+import '../../../hotels/data/repositories/mock_hotel_repository.dart';
+import '../../../hotels/domain/entities/hotel.dart';
+import '../viewmodels/home_view_model.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: NavigationBar(
-        height: 74,
-        selectedIndex: 0,
-        onDestinationSelected: (_) {},
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home_rounded), label: 'الرئيسية'),
-          NavigationDestination(icon: Icon(Icons.explore_outlined), selectedIcon: Icon(Icons.explore_rounded), label: 'استكشف'),
-          NavigationDestination(icon: Icon(Icons.bookmark_outline_rounded), selectedIcon: Icon(Icons.bookmark_rounded), label: 'حجوزاتي'),
-          NavigationDestination(icon: Icon(Icons.person_outline_rounded), selectedIcon: Icon(Icons.person_rounded), label: 'حسابي'),
-        ],
-      ),
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(child: _Header()),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-              sliver: SliverList(delegate: SliverChildListDelegate([
-                const SectionTitle(title: 'وجهات ملهمة', action: 'عرض الكل'),
-                const SizedBox(height: 14),
-                const _Destinations(),
-                const SizedBox(height: 28),
-                const SectionTitle(title: 'إقامات مختارة لك', action: 'عرض الكل'),
-                const SizedBox(height: 14),
-                SizedBox(
-                  height: 286,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: HotelLocalDataSource.featured.length,
-                    itemBuilder: (_, index) => HotelCard(hotel: HotelLocalDataSource.featured[index]),
-                  ),
-                ),
-                const SizedBox(height: 28),
-                const _OfferBanner(),
-                const SizedBox(height: 28),
-              ])),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+class HomePage extends StatefulWidget { const HomePage({super.key}); @override State<HomePage> createState()=>_HomePageState(); }
+class _HomePageState extends State<HomePage> {
+  late final HomeViewModel viewModel;
+  @override void initState(){super.initState();viewModel=HomeViewModel(MockHotelRepository())..load();}
+  @override void dispose(){viewModel.dispose();super.dispose();}
+  @override Widget build(BuildContext context)=>AnimatedBuilder(animation:viewModel,builder:(context,_)=>Scaffold(bottomNavigationBar:const NavigationBar(selectedIndex:0,destinations:[NavigationDestination(icon:Icon(Icons.home_outlined),selectedIcon:Icon(Icons.home),label:'الرئيسية'),NavigationDestination(icon:Icon(Icons.search),label:'البحث'),NavigationDestination(icon:Icon(Icons.bookmark_outline),label:'حجوزاتي'),NavigationDestination(icon:Icon(Icons.person_outline),label:'حسابي')]),body:SafeArea(child:viewModel.isLoading?_skeleton():viewModel.error!=null?_error():CustomScrollView(slivers:[SliverToBoxAdapter(child:_top()),SliverToBoxAdapter(child:_search()),SliverToBoxAdapter(child:_section('عروض خاصة')),SliverToBoxAdapter(child:_promo()),SliverToBoxAdapter(child:_section('استكشف المحافظات')),SliverToBoxAdapter(child:SizedBox(height:114,child:ListView.separated(scrollDirection:Axis.horizontal,padding:const EdgeInsets.symmetric(horizontal:20),itemCount:viewModel.provinces.where((p)=>p.isFeatured).length,separatorBuilder:(_,__)=>const SizedBox(width:12),itemBuilder:(_,i){final p=viewModel.provinces.where((p)=>p.isFeatured).elementAt(i);return _province(p.nameAr,p.hotelsCount);}))),SliverToBoxAdapter(child:_section('إقامات مميزة')),SliverToBoxAdapter(child:_row(viewModel.featured)),SliverToBoxAdapter(child:_section('الأكثر رواجاً')),SliverToBoxAdapter(child:_row(viewModel.popular)),SliverToBoxAdapter(child:_section('مقترحة لك')),SliverPadding(padding:const EdgeInsets.all(20),sliver:SliverGrid(delegate:SliverChildBuilderDelegate((_,i)=>_hotel(viewModel.recommended[i],compact:true),childCount:viewModel.recommended.length),gridDelegate:const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount:2,mainAxisSpacing:12,crossAxisSpacing:12,childAspectRatio:.72))) ]))));
+  Widget _top()=>Padding(padding:const EdgeInsets.fromLTRB(20,14,20,8),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Row(children:[Text('حجوزاتي',style:Theme.of(context).textTheme.titleLarge?.copyWith(color:AppColors.primary)),const Spacer(),const Icon(Icons.notifications_none),const SizedBox(width:12),const CircleAvatar(backgroundColor:AppColors.primary,child:Text('أ',style:TextStyle(color:Colors.white)))]),const SizedBox(height:20),Text('مرحباً أحمد',style:Theme.of(context).textTheme.titleLarge),const Text('إلى أين ستكون رحلتك القادمة؟',style:TextStyle(color:AppColors.muted))]));
+  Widget _search()=>Card(margin:const EdgeInsets.all(20),child:const Padding(padding:EdgeInsets.all(16),child:Column(children:[_SearchLine(Icons.search,'ابحث باسم الفندق'),Divider(),_SearchLine(Icons.location_on,'اختر المحافظة'),Divider(),Row(children:[Expanded(child:_SearchLine(Icons.calendar_month,'الدخول')),Expanded(child:_SearchLine(Icons.people_outline,'الضيوف'))])])));
+  Widget _promo()=>Container(margin:const EdgeInsets.symmetric(horizontal:20),padding:const EdgeInsets.all(20),decoration:BoxDecoration(gradient:const LinearGradient(colors:[AppColors.primary,AppColors.accent]),borderRadius:BorderRadius.circular(20)),child:const Text('وفّر حتى 25% على إقامتك القادمة',style:TextStyle(color:Colors.white,fontWeight:FontWeight.bold)));
+  Widget _section(String text)=>Padding(padding:const EdgeInsets.fromLTRB(20,24,20,10),child:Text(text,style:Theme.of(context).textTheme.titleLarge));
+  Widget _province(String name,int count)=>SizedBox(width:82,child:Column(children:[CircleAvatar(radius:31,backgroundColor:AppColors.primary.withOpacity(.12),child:Text(name.substring(0,1),style:const TextStyle(color:AppColors.primary,fontSize:20,fontWeight:FontWeight.bold))),const SizedBox(height:5),Text(name,maxLines:1,overflow:TextOverflow.ellipsis),Text('$count فندق',style:const TextStyle(fontSize:11,color:AppColors.muted))]));
+  Widget _row(List<Hotel> hotels)=>SizedBox(height:255,child:ListView.separated(scrollDirection:Axis.horizontal,padding:const EdgeInsets.symmetric(horizontal:20),itemCount:hotels.length,separatorBuilder:(_,__)=>const SizedBox(width:12),itemBuilder:(_,i)=>SizedBox(width:220,child:_hotel(hotels[i]))));
+  Widget _hotel(Hotel hotel,{bool compact=false})=>Card(clipBehavior:Clip.antiAlias,child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Expanded(child:Container(color:AppColors.primary.withOpacity(.14),child:Stack(children:[const Center(child:Icon(Icons.hotel_rounded,size:70,color:AppColors.primary)),if(hotel.discountPercentage!=null)Positioned(top:8,right:8,child:Chip(label:Text('خصم ${hotel.discountPercentage}%'))),const Positioned(top:5,left:5,child:Icon(Icons.favorite_border,color:AppColors.accent))]))),Padding(padding:const EdgeInsets.all(10),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text(hotel.nameAr,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontWeight:FontWeight.bold)),Text(hotel.province.nameAr,style:const TextStyle(color:AppColors.muted)),Text('★ ${hotel.rating.toStringAsFixed(1)} (${hotel.reviewsCount})',style:const TextStyle(color:AppColors.warning,fontSize:12)),Text('${hotel.minimumPricePerNight ~/ 1000} ألف د.ع',style:const TextStyle(color:AppColors.primary,fontWeight:FontWeight.bold))]) )]));
+  Widget _skeleton()=>ListView(padding:const EdgeInsets.all(20),children:List.generate(6,(_)=>Container(height:100,margin:const EdgeInsets.only(bottom:16),decoration:BoxDecoration(color:Colors.white,borderRadius:BorderRadius.circular(20))));
+  Widget _error()=>Center(child:FilledButton(onPressed:viewModel.load,child:const Text('إعادة المحاولة')));
 }
-
-class _Header extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(colors: [AppColors.navy, AppColors.deepBlue], begin: Alignment.topRight, end: Alignment.bottomLeft),
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(34)),
-        ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Container(
-              width: 43, height: 43,
-              decoration: BoxDecoration(color: Colors.white.withOpacity(.15), shape: BoxShape.circle),
-              child: const Icon(Icons.notifications_none_rounded, color: Colors.white),
-            ),
-            const Spacer(),
-            const Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Text('أهلاً أحمد', style: TextStyle(color: Color(0xFFD9F6F2), fontSize: 14)),
-              SizedBox(height: 3), Text('إلى أين تأخذك رحلتك؟', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 19)),
-            ]),
-          ]),
-          const SizedBox(height: 25),
-          Container(
-            height: 60,
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(19)),
-            child: const Row(children: [
-              Padding(padding: EdgeInsetsDirectional.only(start: 16), child: Icon(Icons.search_rounded, color: AppColors.ocean, size: 26)),
-              SizedBox(width: 11), Text('ابحث عن مدينة أو فندق', style: TextStyle(color: Color(0xFF829AB1), fontSize: 15)),
-            ]),
-          ),
-        ]),
-      );
-}
-
-class _Destinations extends StatelessWidget {
-  const _Destinations();
-  @override
-  Widget build(BuildContext context) {
-    const places = [('دبي', Icons.nightlife_rounded, 0xFFEA796F), ('العلا', Icons.landscape_rounded, 0xFFCB923D), ('بيروت', Icons.waves_rounded, 0xFF197D96), ('مسقط', Icons.sailing_rounded, 0xFF388E7A)];
-    return SizedBox(height: 94, child: ListView.separated(
-      scrollDirection: Axis.horizontal, itemCount: places.length, separatorBuilder: (_, __) => const SizedBox(width: 13),
-      itemBuilder: (_, i) { final place = places[i]; return SizedBox(width: 70, child: Column(children: [
-        Container(width: 60, height: 60, decoration: BoxDecoration(color: Color(place.$3).withOpacity(.12), shape: BoxShape.circle), child: Icon(place.$2, color: Color(place.$3), size: 29)),
-        const SizedBox(height: 7), Text(place.$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-      ])); },
-    ));
-  }
-}
-
-class _OfferBanner extends StatelessWidget {
-  const _OfferBanner();
-  @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(colors: [AppColors.turquoise, AppColors.ocean]),
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Row(children: [
-          const Icon(Icons.card_giftcard_rounded, size: 48, color: AppColors.gold),
-          const SizedBox(width: 15),
-          const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('خصم حتى 25٪', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
-            SizedBox(height: 4), Text('على إقامتك القادمة مع حجوزاتي', style: TextStyle(color: Color(0xFFD9F6F2), fontSize: 13)),
-          ])),
-          const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
-        ]),
-      );
-}
+class _SearchLine extends StatelessWidget { const _SearchLine(this.icon,this.label); final IconData icon; final String label; @override Widget build(BuildContext context)=>Row(children:[Icon(icon,color:AppColors.primary),const SizedBox(width:8),Text(label,style:const TextStyle(color:AppColors.muted))]); }
