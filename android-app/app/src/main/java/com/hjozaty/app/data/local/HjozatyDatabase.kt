@@ -5,7 +5,8 @@ import androidx.room.RoomDatabase
 import com.hjozaty.app.data.local.dao.HotelDao
 import com.hjozaty.app.data.local.entity.HotelEntity
 
-@Database(entities = [HotelEntity::class], version = 1, exportSchema = false)
+/** Local source of truth for the future offline-first repository. */
+@Database(entities = [HotelEntity::class], version = 1, exportSchema = true)
 abstract class HjozatyDatabase : RoomDatabase() {
     abstract fun hotelDao(): HotelDao
 }

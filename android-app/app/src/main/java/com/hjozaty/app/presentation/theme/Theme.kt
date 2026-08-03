@@ -10,6 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 import com.hjozaty.app.R
+import com.hjozaty.app.designsystem.HShapes
 
 private val LightColors = lightColorScheme(
     primary = Primary, onPrimary = Color.White, primaryContainer = PrimaryContainer,
@@ -17,6 +18,15 @@ private val LightColors = lightColorScheme(
     background = AppBackground, onBackground = AppText, surface = AppSurface,
     onSurface = AppText, surfaceVariant = Color(0xFFEAF0F0), onSurfaceVariant = MutedText,
     outline = Outline, error = Danger, onError = Color.White
+)
+
+private val DarkColors = androidx.compose.material3.darkColorScheme(
+    primary = Color(0xFF8FD4DF), onPrimary = Color(0xFF003640),
+    secondary = Color(0xFFFFB68A), onSecondary = Color(0xFF4A1B00),
+    background = Color(0xFF101719), onBackground = Color(0xFFE2E9EA),
+    surface = Color(0xFF182022), onSurface = Color(0xFFE2E9EA),
+    surfaceVariant = Color(0xFF314649), onSurfaceVariant = Color(0xFFC0CFD1),
+    error = Color(0xFFFFB4AB), onError = Color(0xFF690005)
 )
 
 private val Cairo = FontFamily(Font(R.font.cairo_variable))
@@ -31,8 +41,8 @@ private val HjozatyTypography = androidx.compose.material3.Typography(
     labelLarge = TextStyle(fontFamily = Tajawal, fontWeight = FontWeight.Bold, fontSize = 14.sp)
 )
 
-/** Light theme ready for a future dark color scheme without changing call sites. */
+/** The default remains light while dark mode can be enabled without feature changes. */
 @Composable
-fun HjozatyTheme(content: @Composable () -> Unit) {
-    MaterialTheme(colorScheme = LightColors, typography = HjozatyTypography, content = content)
+fun HjozatyTheme(useDarkTheme: Boolean = false, content: @Composable () -> Unit) {
+    MaterialTheme(colorScheme = if (useDarkTheme) DarkColors else LightColors, typography = HjozatyTypography, shapes = HShapes, content = content)
 }
