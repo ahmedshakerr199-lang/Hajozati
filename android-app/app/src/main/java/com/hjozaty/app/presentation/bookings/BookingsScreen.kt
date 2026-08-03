@@ -7,8 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.hjozaty.app.designsystem.HEmptyState
-import com.hjozaty.app.designsystem.HTopAppBar
+import com.hjozaty.app.designsystem.loading.HEmptyState
+import com.hjozaty.app.designsystem.navigation.HTopAppBar
 import com.hjozaty.app.presentation.theme.*
 
 @Composable fun BookingsScreen() = Column(Modifier.fillMaxSize().background(AppBackground).padding(20.dp).padding(top = 34.dp)) {

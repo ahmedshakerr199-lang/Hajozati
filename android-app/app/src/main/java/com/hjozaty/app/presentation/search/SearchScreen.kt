@@ -10,10 +10,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.hjozaty.app.designsystem.HButton
-import com.hjozaty.app.designsystem.HCard
-import com.hjozaty.app.designsystem.HSearchBar
-import com.hjozaty.app.designsystem.HTopAppBar
+import com.hjozaty.app.designsystem.buttons.HButton
+import com.hjozaty.app.designsystem.cards.HCard
+import com.hjozaty.app.designsystem.inputs.HSearchBar
+import com.hjozaty.app.designsystem.navigation.HTopAppBar
 import com.hjozaty.app.presentation.theme.*
 import com.hjozaty.app.utils.InputValidator
 

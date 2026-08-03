@@ -17,8 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.hjozaty.app.designsystem.HCard
-import com.hjozaty.app.designsystem.HTopAppBar
+import com.hjozaty.app.designsystem.cards.HCard
+import com.hjozaty.app.designsystem.navigation.HTopAppBar
 import com.hjozaty.app.presentation.theme.*
 
 @Composable fun AccountScreen() = Column(Modifier.fillMaxSize().background(AppBackground).padding(20.dp).padding(top = 34.dp)) {

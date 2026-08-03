@@ -18,7 +18,7 @@ import com.hjozaty.app.presentation.bookings.BookingsScreen
 import com.hjozaty.app.presentation.home.HomeScreen
 import com.hjozaty.app.presentation.search.SearchScreen
 import com.hjozaty.app.presentation.splash.SplashScreen
-import com.hjozaty.app.designsystem.HBottomNavigation
+import com.hjozaty.app.designsystem.navigation.HBottomNavigation
 
 @Composable
 fun HjozatyNavGraph() {

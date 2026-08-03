@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 /** Mock implementation. Replace the sources with Room/API as the product grows. */
+/** Temporary local implementation; replace its source with Room and remote data in a later phase. */
 class HotelRepositoryImpl @Inject constructor() : HotelRepository {
     override fun observeHotels(): Flow<List<Hotel>> = flowOf(MockHotelData.hotels)
     override fun observeGovernorates(): Flow<List<String>> = flowOf(MockHotelData.governorates)
