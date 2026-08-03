@@ -3,7 +3,7 @@ package com.hjozaty.app.di
 import android.content.Context
 import androidx.room.Room
 import com.hjozaty.app.data.local.HjozatyDatabase
-import com.hjozaty.app.data.repository.HotelRepositoryImpl
+import com.hjozaty.app.data.repository.MockHotelRepository
 import com.hjozaty.app.domain.repository.HotelRepository
 import dagger.Binds
 import dagger.Module
@@ -16,7 +16,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
-    @Binds @Singleton abstract fun bindHotelRepository(impl: HotelRepositoryImpl): HotelRepository
+    @Binds @Singleton abstract fun bindHotelRepository(impl: MockHotelRepository): HotelRepository
 }
 
 @Module

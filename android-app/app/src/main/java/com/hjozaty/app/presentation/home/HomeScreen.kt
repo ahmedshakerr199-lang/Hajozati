@@ -35,16 +35,16 @@ import com.hjozaty.app.presentation.theme.Primary
 @Composable
 fun HomeScreen(onSearchClick: () -> Unit, viewModel: HomeViewModel = hiltViewModel()) {
     val hotels by viewModel.hotels.collectAsState(initial = emptyList())
-    var selected by rememberSaveable { mutableStateOf("كل المحافظات") }
-    val places = listOf("كل المحافظات", "بغداد", "أربيل", "النجف", "البصرة", "السليمانية")
-    val visible = hotels.filter { selected == "كل المحافظات" || it.governorate == selected }
+    var selected by rememberSaveable { mutableStateOf("all") }
+    val places = listOf("all" to "كل المحافظات", "baghdad" to "بغداد", "erbil" to "أربيل", "najaf" to "النجف", "basra" to "البصرة", "sulaymaniyah" to "السليمانية")
+    val visible = hotels.filter { selected == "all" || it.provinceId == selected }
     HRefreshContainer(isRefreshing = false, onRefresh = {}) {
         LazyColumn(Modifier.fillMaxSize().background(AppBackground), contentPadding = PaddingValues(bottom = 24.dp)) {
             item { Header() }
             item { SearchCard(onSearchClick) }
             item {
                 Text("اختر وجهتك", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp))
-                Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 20.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) { places.forEach { place -> HChip(place, selected == place) { selected = place } } }
+                Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 20.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) { places.forEach { (id, label) -> HChip(label, selected == id) { selected = id } } }
             }
             item { OfferCard() }
             item { HSectionTitle("إقامات مختارة لك", "عرض الكل") }

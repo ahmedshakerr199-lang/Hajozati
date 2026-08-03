@@ -1,14 +1,21 @@
 package com.hjozaty.app.data.mock
 
-import com.hjozaty.app.domain.model.Hotel
+import com.hjozaty.app.domain.model.*
 
+/** Clearly-labelled fictional data source for UI development only. */
 object MockHotelData {
-    val governorates = listOf("كل المحافظات", "بغداد", "أربيل", "النجف", "كربلاء", "البصرة", "السليمانية", "دهوك")
+    private const val image = "https://images.unsplash.com/photo-1566073771259-6a8506099945"
+    val provinces = listOf(
+        Province("baghdad","بغداد","Baghdad",null,4,true), Province("basra","البصرة","Basra",null,3,true), Province("nineveh","نينوى","Nineveh",null,2,true), Province("erbil","أربيل","Erbil",null,4,true), Province("sulaymaniyah","السليمانية","Sulaymaniyah",null,3,true), Province("duhok","دهوك","Duhok",null,2,true), Province("kirkuk","كركوك","Kirkuk",null,2,false), Province("anbar","الأنبار","Anbar",null,0,false), Province("salah-al-din","صلاح الدين","Salah al-Din",null,0,false), Province("diyala","ديالى","Diyala",null,0,false), Province("wasit","واسط","Wasit",null,0,false), Province("maysan","ميسان","Maysan",null,0,false), Province("dhi-qar","ذي قار","Dhi Qar",null,2,true), Province("muthanna","المثنى","Muthanna",null,0,false), Province("qadisiyah","القادسية","Qadisiyah",null,0,false), Province("babil","بابل","Babil",null,0,false), Province("karbala","كربلاء","Karbala",null,2,true), Province("najaf","النجف","Najaf",null,3,true), Province("halabja","حلبجة","Halabja",null,0,false)
+    )
+    private val policies = HotelPolicies("14:00", "23:00", "07:00", "12:00", true, false, false, false, "إلغاء مجاني حتى 24 ساعة قبل الوصول.", "Free cancellation until 24 hours before arrival.")
+    private val standardAmenities = listOf(HotelAmenity("wifi",HotelAmenityType.FREE_WIFI),HotelAmenity("parking",HotelAmenityType.PARKING),HotelAmenity("ac",HotelAmenityType.AIR_CONDITIONING),HotelAmenity("reception",HotelAmenityType.RECEPTION_24H))
+    private fun hotel(id: String, province: String, city: String, name: String, index: Int, category: HotelCategory = HotelCategory.HOTEL): Hotel {
+        val price = (80_000L + index * 7_500L)
+        val rooms = listOf(RoomType("$id-standard",id,"غرفة قياسية","Standard room","غرفة مريحة تجريبية","Comfortable demo room",2,1,"سرير مزدوج","Double bed",28,price,4,listOf(image),listOf(RoomAmenity.WIFI,RoomAmenity.AIR_CONDITIONING),true,true), RoomType("$id-suite",id,"جناح عائلي","Family suite","جناح تجريبي واسع","Spacious demo suite",4,2,"سريران مزدوجان","Two double beds",45,price + 35_000,2,listOf(image),listOf(RoomAmenity.WIFI,RoomAmenity.TV,RoomAmenity.BALCONY),false,true))
+        return Hotel(id,"فندق $name التجريبي","$name Demo Hotel","إقامة تجريبية معدّة لعرض واجهة حجوزاتي.","Demo accommodation for Hjozaty UI.",province,city,city,"وسط المدينة","City center",33.3 + index / 100.0,44.3 + index / 100.0,category,3 + index % 3,4.1 + (index % 8) / 10.0,80 + index * 37,price,"IQD",image,listOf(image),standardAmenities,rooms,policies,index % 3 == 0,index % 2 == 0,index % 4 == 0,false,if(index % 5 == 0) 15 else null,"2026-08-03T00:00:00Z")
+    }
     val hotels = listOf(
-        Hotel(1, "فندق بابل روتانا", "بغداد", "المنطقة الخضراء", 4.8, 1240, 215000, "🏛️", "الأكثر طلباً"),
-        Hotel(2, "ديفان أربيل", "أربيل", "شارع كولان", 4.7, 980, 185000, "✨", "خصم 15%"),
-        Hotel(3, "قصر النخيل", "البصرة", "العشار", 4.6, 615, 130000, "🌴"),
-        Hotel(4, "دار الضيافة", "النجف", "المدينة القديمة", 4.9, 1740, 95000, "🕌", "قريب من المرقد"),
-        Hotel(5, "غراند ميلينيوم", "السليمانية", "سالم ستريت", 4.7, 730, 160000, "🏔️")
+        hotel("bag-01","baghdad","بغداد","دجلة",1),hotel("bag-02","baghdad","بغداد","الرافدين",2,HotelCategory.HOTEL_APARTMENT),hotel("bag-03","baghdad","بغداد","النخيل",3),hotel("bag-04","baghdad","بغداد","المدينة",4),hotel("bas-01","basra","البصرة","شط العرب",5),hotel("bas-02","basra","البصرة","البصرة الجديدة",6),hotel("bas-03","basra","البصرة","الميناء",7,HotelCategory.APARTMENT),hotel("erb-01","erbil","أربيل","قلعة أربيل",8),hotel("erb-02","erbil","أربيل","كردستان",9),hotel("erb-03","erbil","أربيل","الواحة",10,HotelCategory.RESORT),hotel("erb-04","erbil","أربيل","الحدائق",11),hotel("sul-01","sulaymaniyah","السليمانية","الجبل",12),hotel("sul-02","sulaymaniyah","السليمانية","السراي",13),hotel("sul-03","sulaymaniyah","السليمانية","النسيم",14),hotel("naj-01","najaf","النجف","الضيافة",15),hotel("naj-02","najaf","النجف","الواحة",16,HotelCategory.HOTEL_APARTMENT),hotel("naj-03","najaf","النجف","الزائر",17),hotel("kar-01","karbala","كربلاء","المرقد",18),hotel("kar-02","karbala","كربلاء","الصفا",19),hotel("dhi-01","dhi-qar","الناصرية","أور",20),hotel("dhi-02","dhi-qar","الناصرية","السومر",21),hotel("nin-01","nineveh","الموصل","نينوى",22),hotel("nin-02","nineveh","الموصل","الحدباء",23),hotel("duh-01","duhok","دهوك","زاخو",24),hotel("kir-01","kirkuk","كركوك","القلعة",25)
     )
 }
