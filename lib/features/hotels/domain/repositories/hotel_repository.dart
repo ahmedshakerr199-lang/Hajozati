@@ -4,5 +4,7 @@ import '../entities/province.dart';
 abstract interface class HotelRepository {
   Stream<List<Province>> watchProvinces();
   Stream<List<Hotel>> watchHotels();
+  Future<Hotel?> getHotelById(String hotelId);
+  Future<List<Hotel>> getSimilarHotels(String hotelId);
   Future<void> setFavorite(String hotelId, bool isFavorite);
 }
