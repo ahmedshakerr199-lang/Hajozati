@@ -14,12 +14,11 @@
 
 ## التشغيل
 
-بعد توفر Flutter SDK صالح، أنشئ ملفات المنصات إن لم تكن موجودة ثم شغّل التطبيق:
+شغّل التطبيق من مشروع Flutter الرئيسي:
 
 ```bash
-flutter create --platforms=android,ios .
 flutter pub get
 flutter run
 ```
 
-لا تُحذف أي نسخة سابقة قبل التحقق من نجاح توليد منصات Flutter وتشغيل التطبيق عليها.
+المجلدان `android/` و`ios/` هما منصتا Flutter الرسميتان. لا يوجد مشروع Android Native مستقل معتمد.
