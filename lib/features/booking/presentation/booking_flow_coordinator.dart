@@ -37,6 +37,9 @@ class BookingFlowCoordinator {
     if (existing != null) return AppSuccess(existing);
     final result = await _get(bookingId);
     if (result is AppFailure<Booking>) return AppFailure(result.error);
+    if ((result as AppSuccess<Booking>).data.status != BookingStatus.draft) {
+      return const AppFailure(ValidationAppError('الحجز ليس مسودة نشطة.'));
+    }
     final vm = _factory();
     await vm.loadBooking(bookingId);
     _flows[bookingId] = vm;

@@ -8,4 +8,5 @@ abstract final class AppRoutes {
   static const roomSelection = '/room-selection';
   static const bookingDetails = '/booking-details';
   static const bookingSummary = '/booking-summary';
+  static const bookingConfirmation = '/booking-confirmation';
 }

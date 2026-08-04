@@ -10,6 +10,7 @@ import '../../features/search/presentation/search_page.dart';
 import '../../features/booking/presentation/room_selection_page.dart';
 import '../../features/booking/presentation/booking_details_page.dart';
 import '../../features/booking/presentation/booking_summary_page.dart';
+import '../../features/booking/presentation/booking_confirmation_page.dart';
 import 'app_routes.dart';
 
 /// Central, ID-only route table. Detail routes can be extended for deep links.
@@ -38,6 +39,11 @@ abstract final class AppRouter {
           MaterialPageRoute(
               builder: (_) =>
                   BookingSummaryPage(bookingId: settings.arguments! as String),
+              settings: settings),
+        AppRoutes.bookingConfirmation when settings.arguments is String =>
+          MaterialPageRoute(
+              builder: (_) => BookingConfirmationPage(
+                  bookingId: settings.arguments! as String),
               settings: settings),
         AppRoutes.hotelDetails when settings.arguments is String =>
           MaterialPageRoute(

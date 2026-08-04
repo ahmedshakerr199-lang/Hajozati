@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../app/app_dependencies.dart';
 import '../../../core/result/app_result.dart';
+import '../../../app/navigation/app_routes.dart';
 import 'booking_view_model.dart';
 
 class BookingSummaryPage extends StatefulWidget {
@@ -40,7 +41,21 @@ class _BookingSummaryPageState extends State<BookingSummaryPage> {
                   Text('الليالي: ${vm.nights}'),
                   Text('Grand Total: ${vm.grandTotal}'),
                   FilledButton(
-                      onPressed: vm.confirmBooking,
+                      onPressed: () async {
+                        await vm.confirmBooking();
+                        if (!context.mounted) return;
+                        if (vm.state == BookingViewState.confirmed) {
+                          await AppDependencies.bookingFlow
+                              .releaseBookingFlow(widget.bookingId);
+                          if (!context.mounted) return;
+                          Navigator.pushReplacementNamed(
+                              context, AppRoutes.bookingConfirmation,
+                              arguments: widget.bookingId);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(vm.error ?? 'تعذر تأكيد الحجز.')));
+                        }
+                      },
                       child: const Text('تأكيد الحجز'))
                 ]));
           });

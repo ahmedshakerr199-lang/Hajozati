@@ -9,6 +9,7 @@ import '../features/booking/domain/booking_repository.dart';
 import '../features/booking/domain/booking_use_cases.dart';
 import '../features/booking/presentation/booking_flow_coordinator.dart';
 import '../features/booking/presentation/booking_view_model.dart';
+import '../features/booking/presentation/booking_confirmation_view_model.dart';
 import '../features/search/data/mock_search_repository.dart';
 import '../features/search/domain/search_repository.dart';
 
@@ -36,4 +37,7 @@ class AppDependencies {
       GetBookingUseCase(bookings),
       CancelBookingUseCase(bookings),
       createBookingViewModel);
+  static BookingConfirmationViewModel createBookingConfirmationViewModel(
+          String bookingId) =>
+      BookingConfirmationViewModel(GetBookingUseCase(bookings), bookingId);
 }
