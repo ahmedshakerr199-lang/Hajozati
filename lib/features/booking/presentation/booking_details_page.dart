@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../app/app_dependencies.dart';
 import '../../../core/result/app_result.dart';
+import '../../../app/navigation/app_routes.dart';
 import 'booking_view_model.dart';
 
 class BookingDetailsPage extends StatefulWidget {
@@ -42,7 +43,14 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
                   Text('الأطفال: ${vm.children}'),
                   ...vm.validationMessages.map(Text.new),
                   FilledButton(
-                      onPressed: vm.validateBooking,
+                      onPressed: () async {
+                        await vm.validateBooking();
+                        if (vm.state == BookingViewState.readyForConfirmation &&
+                            context.mounted) {
+                          Navigator.pushNamed(context, AppRoutes.bookingSummary,
+                              arguments: widget.bookingId);
+                        }
+                      },
                       child: const Text('متابعة'))
                 ]));
           });

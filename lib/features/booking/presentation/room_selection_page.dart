@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../app/app_dependencies.dart';
 import '../../../core/result/app_result.dart';
+import '../../../app/navigation/app_routes.dart';
 import '../domain/booking_models.dart';
 import 'booking_view_model.dart';
 
@@ -68,7 +69,13 @@ class _RoomSelectionPageState extends State<RoomSelectionPage> {
                                   await vm.selectRoom(
                                       BookingRoom(roomType: type, quantity: 1));
                                   await vm.calculatePrice();
-                                  if (mounted) setState(() {});
+                                  if (!context.mounted) {
+                                    return;
+                                  }
+                                  setState(() {});
+                                  Navigator.pushNamed(
+                                      context, AppRoutes.bookingDetails,
+                                      arguments: widget.bookingId);
                                 }));
                       }).toList());
                     }));
