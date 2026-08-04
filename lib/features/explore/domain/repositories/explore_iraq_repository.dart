@@ -1,0 +1,2 @@
+import '../../../../core/result/app_result.dart'; import '../entities/tourist_destination.dart';
+abstract interface class ExploreIraqRepository { Stream<List<TouristDestination>> observeDestinations(); Stream<List<TouristDestination>> observeFeaturedDestinations(); Stream<List<TouristDestination>> observePopularDestinations(); Stream<List<TouristDestination>> observeDestinationsByProvince(String provinceId); Future<AppResult<TouristDestination?>> getDestinationById(String id); }
