@@ -173,7 +173,15 @@ abstract final class MockHotelDataSource {
     'dhi-qar' => (31.0439, 46.2573),
     'najaf' => (32.0000, 44.3300),
     'karbala' => (32.6160, 44.0249),
-    _ => (33.3152, 44.3661),
+    'anbar' => (33.4258, 43.2992),
+    'salah-al-din' => (34.6071, 43.6782),
+    'diyala' => (33.7476, 44.6573),
+    'wasit' => (32.5128, 45.8182),
+    'maysan' => (31.8356, 47.1448),
+    'muthanna' => (31.3190, 45.2806),
+    'qadisiyah' => (31.9929, 44.9255),
+    'babil' => (32.4721, 44.4217),
+    _ => (0.0, 0.0),
   };
   final offset = (index % 4) * .008;
   return (center.$1 + offset, center.$2 - offset);

@@ -23,12 +23,16 @@ class ExploreViewModel extends ChangeNotifier {
   String? selectedProvince;
   DestinationCategory? selectedCategory;
   String? error;
+  List<TouristDestination> _allItems = const [];
+  List<String> get provinces =>
+      _allItems.map((item) => item.provinceId).toSet().toList()..sort();
   StreamSubscription<List<TouristDestination>>? _subscription;
   Future<void> load() async {
     state = ExploreState.loading;
     notifyListeners();
     _subscription?.cancel();
     _subscription = _all().listen((items) {
+      _allItems = items;
       destinations = items;
       state = items.isEmpty ? ExploreState.empty : ExploreState.success;
       notifyListeners();
@@ -55,7 +59,9 @@ class ExploreViewModel extends ChangeNotifier {
     selectedCategory = null;
     query = '';
     if (id == null) {
-      await load();
+      destinations = _allItems;
+      state = destinations.isEmpty ? ExploreState.empty : ExploreState.success;
+      notifyListeners();
       return;
     }
     _apply(await _province(id));
@@ -66,7 +72,9 @@ class ExploreViewModel extends ChangeNotifier {
     selectedProvince = null;
     query = '';
     if (category == null) {
-      await load();
+      destinations = _allItems;
+      state = destinations.isEmpty ? ExploreState.empty : ExploreState.success;
+      notifyListeners();
       return;
     }
     _apply(await _category(category));

@@ -54,6 +54,17 @@ class _ExploreIraqPageState extends State<ExploreIraqPage> {
               prefixIcon: Icon(Icons.search),
               hintText: 'ابحث بالعربية أو الإنجليزية')),
       const SizedBox(height: 12),
+      DropdownButtonFormField<String>(
+          value: vm.selectedProvince,
+          decoration: const InputDecoration(labelText: 'المحافظة'),
+          hint: const Text('جميع المحافظات'),
+          items: [
+            const DropdownMenuItem(value: null, child: Text('جميع المحافظات')),
+            ...vm.provinces.map(
+                (value) => DropdownMenuItem(value: value, child: Text(value)))
+          ],
+          onChanged: vm.filterProvince),
+      const SizedBox(height: 12),
       Wrap(spacing: 6, children: [
         ChoiceChip(
             label: const Text('الكل'),

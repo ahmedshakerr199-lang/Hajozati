@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../../../../core/location/location_service.dart';
 import '../../../../core/result/app_result.dart';
 import '../../domain/nearby_hotels.dart';
+import '../../../hotels/domain/repositories/hotel_repository.dart';
 
 enum NearbyViewState {
   idle,
@@ -16,9 +17,10 @@ enum NearbyViewState {
 }
 
 class NearbyHotelsViewModel extends ChangeNotifier {
-  NearbyHotelsViewModel(this._location, this._nearby);
+  NearbyHotelsViewModel(this._location, this._nearby, this._hotels);
   final LocationService _location;
   final GetNearbyHotelsUseCase _nearby;
+  final HotelRepository _hotels;
   NearbyViewState state = NearbyViewState.idle;
   List<NearbyHotel> allHotels = const [];
   NearbyRange range = NearbyRange.all;
@@ -92,12 +94,32 @@ class NearbyHotelsViewModel extends ChangeNotifier {
 
   Future<void> openSettings() => _location.openAppSettings();
   Future<void> openLocationSettings() => _location.openLocationSettings();
+  Future<AppResult<void>> toggleFavorite(String hotelId) async {
+    try {
+      final index = allHotels.indexWhere((item) => item.hotel.id == hotelId);
+      if (index < 0)
+        return const AppFailure(NotFoundAppError('الفندق غير موجود.'));
+      final old = allHotels[index];
+      await _hotels.setFavorite(hotelId, !old.hotel.isFavorite);
+      allHotels = List.of(allHotels)
+        ..[index] = NearbyHotel(
+            old.hotel.copyWith(isFavorite: !old.hotel.isFavorite),
+            old.distanceKm);
+      notifyListeners();
+      return const AppSuccess(null);
+    } catch (_) {
+      return const AppFailure(UnknownAppError('تعذر تحديث المفضلة.'));
+    }
+  }
+
   void _setError(AppError error) {
     state = error is LocationServiceDisabledAppError
         ? NearbyViewState.serviceDisabled
         : error is PermissionAppError
             ? NearbyViewState.permissionDenied
-            : NearbyViewState.error;
+            : error is UnknownAppError
+                ? NearbyViewState.locationUnavailable
+                : NearbyViewState.error;
     message = error.message;
     notifyListeners();
   }

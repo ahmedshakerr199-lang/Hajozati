@@ -18,7 +18,8 @@ class _NearbyHotelsPageState extends State<NearbyHotelsPage> {
     vm = NearbyHotelsViewModel(
         AppDependencies.location,
         GetNearbyHotelsUseCase(
-            AppDependencies.hotels, CalculateDistanceUseCase()))
+            AppDependencies.hotels, CalculateDistanceUseCase()),
+        AppDependencies.hotels)
       ..load();
   }
 
@@ -75,8 +76,12 @@ class _NearbyHotelsPageState extends State<NearbyHotelsPage> {
                   ? '${(item.distanceKm * 1000).round()} م'
                   : '${item.distanceKm.toStringAsFixed(1)} كم'),
               IconButton(
-                  onPressed: () => AppDependencies.hotels
-                      .setFavorite(item.hotel.id, !item.hotel.isFavorite),
+                  onPressed: () async {
+                    final result = await vm.toggleFavorite(item.hotel.id);
+                    if (result is AppFailure<void> && mounted)
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(result.error.message)));
+                  },
                   icon: Icon(item.hotel.isFavorite
                       ? Icons.favorite
                       : Icons.favorite_border))
