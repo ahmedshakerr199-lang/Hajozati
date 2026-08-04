@@ -1,24 +1,64 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../hotels/data/repositories/mock_hotel_repository.dart';
-import '../../../hotels/domain/entities/hotel.dart';
-import '../../../hotels/presentation/pages/hotel_details_page.dart';
+import '../../../../app/app_dependencies.dart';
+import '../../../../app/navigation/app_routes.dart';
 import '../viewmodels/home_view_model.dart';
 
-class HomePage extends StatefulWidget { const HomePage({super.key}); @override State<HomePage> createState()=>_HomePageState(); }
-class _HomePageState extends State<HomePage> {
-  late final HomeViewModel viewModel;
-  @override void initState(){super.initState();viewModel=HomeViewModel(MockHotelRepository())..load();}
-  @override void dispose(){viewModel.dispose();super.dispose();}
-  @override Widget build(BuildContext context)=>AnimatedBuilder(animation:viewModel,builder:(context,_)=>Scaffold(bottomNavigationBar:const NavigationBar(selectedIndex:0,destinations:[NavigationDestination(icon:Icon(Icons.home_outlined),selectedIcon:Icon(Icons.home),label:'الرئيسية'),NavigationDestination(icon:Icon(Icons.search),label:'البحث'),NavigationDestination(icon:Icon(Icons.bookmark_outline),label:'حجوزاتي'),NavigationDestination(icon:Icon(Icons.person_outline),label:'حسابي')]),body:SafeArea(child:viewModel.isLoading?_skeleton():viewModel.error!=null?_error():CustomScrollView(slivers:[SliverToBoxAdapter(child:_top()),SliverToBoxAdapter(child:_search()),SliverToBoxAdapter(child:_section('عروض خاصة')),SliverToBoxAdapter(child:_promo()),SliverToBoxAdapter(child:_section('استكشف المحافظات')),SliverToBoxAdapter(child:SizedBox(height:114,child:ListView.separated(scrollDirection:Axis.horizontal,padding:const EdgeInsets.symmetric(horizontal:20),itemCount:viewModel.provinces.where((p)=>p.isFeatured).length,separatorBuilder:(_,__)=>const SizedBox(width:12),itemBuilder:(_,i){final p=viewModel.provinces.where((p)=>p.isFeatured).elementAt(i);return _province(p.nameAr,p.hotelsCount);}))),SliverToBoxAdapter(child:_section('إقامات مميزة')),SliverToBoxAdapter(child:_row(viewModel.featured)),SliverToBoxAdapter(child:_section('الأكثر رواجاً')),SliverToBoxAdapter(child:_row(viewModel.popular)),SliverToBoxAdapter(child:_section('مقترحة لك')),SliverPadding(padding:const EdgeInsets.all(20),sliver:SliverGrid(delegate:SliverChildBuilderDelegate((_,i)=>_hotel(viewModel.recommended[i],compact:true),childCount:viewModel.recommended.length),gridDelegate:const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount:2,mainAxisSpacing:12,crossAxisSpacing:12,childAspectRatio:.72))) ]))));
-  Widget _top()=>Padding(padding:const EdgeInsets.fromLTRB(20,14,20,8),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Row(children:[Text('حجوزاتي',style:Theme.of(context).textTheme.titleLarge?.copyWith(color:AppColors.primary)),const Spacer(),const Icon(Icons.notifications_none),const SizedBox(width:12),const CircleAvatar(backgroundColor:AppColors.primary,child:Text('أ',style:TextStyle(color:Colors.white)))]),const SizedBox(height:20),Text('مرحباً أحمد',style:Theme.of(context).textTheme.titleLarge),const Text('إلى أين ستكون رحلتك القادمة؟',style:TextStyle(color:AppColors.muted))]));
-  Widget _search()=>Card(margin:const EdgeInsets.all(20),child:const Padding(padding:EdgeInsets.all(16),child:Column(children:[_SearchLine(Icons.search,'ابحث باسم الفندق'),Divider(),_SearchLine(Icons.location_on,'اختر المحافظة'),Divider(),Row(children:[Expanded(child:_SearchLine(Icons.calendar_month,'الدخول')),Expanded(child:_SearchLine(Icons.people_outline,'الضيوف'))])])));
-  Widget _promo()=>Container(margin:const EdgeInsets.symmetric(horizontal:20),padding:const EdgeInsets.all(20),decoration:BoxDecoration(gradient:const LinearGradient(colors:[AppColors.primary,AppColors.accent]),borderRadius:BorderRadius.circular(20)),child:const Text('وفّر حتى 25% على إقامتك القادمة',style:TextStyle(color:Colors.white,fontWeight:FontWeight.bold)));
-  Widget _section(String text)=>Padding(padding:const EdgeInsets.fromLTRB(20,24,20,10),child:Text(text,style:Theme.of(context).textTheme.titleLarge));
-  Widget _province(String name,int count)=>SizedBox(width:82,child:Column(children:[CircleAvatar(radius:31,backgroundColor:AppColors.primary.withOpacity(.12),child:Text(name.substring(0,1),style:const TextStyle(color:AppColors.primary,fontSize:20,fontWeight:FontWeight.bold))),const SizedBox(height:5),Text(name,maxLines:1,overflow:TextOverflow.ellipsis),Text('$count فندق',style:const TextStyle(fontSize:11,color:AppColors.muted))]));
-  Widget _row(List<Hotel> hotels)=>SizedBox(height:255,child:ListView.separated(scrollDirection:Axis.horizontal,padding:const EdgeInsets.symmetric(horizontal:20),itemCount:hotels.length,separatorBuilder:(_,__)=>const SizedBox(width:12),itemBuilder:(_,i)=>SizedBox(width:220,child:_hotel(hotels[i]))));
-  Widget _hotel(Hotel hotel,{bool compact=false})=>InkWell(onTap:()=>Navigator.push(context,MaterialPageRoute(builder:(_)=>HotelDetailsPage(hotelId:hotel.id,repository:viewModel.repository))),child:Card(clipBehavior:Clip.antiAlias,child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Expanded(child:Container(color:AppColors.primary.withOpacity(.14),child:Stack(children:[const Center(child:Icon(Icons.hotel_rounded,size:70,color:AppColors.primary)),if(hotel.discountPercentage!=null)Positioned(top:8,right:8,child:Chip(label:Text('خصم ${hotel.discountPercentage}%'))),const Positioned(top:5,left:5,child:Icon(Icons.favorite_border,color:AppColors.accent))]))),Padding(padding:const EdgeInsets.all(10),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text(hotel.nameAr,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontWeight:FontWeight.bold)),Text(hotel.province.nameAr,style:const TextStyle(color:AppColors.muted)),Text('★ ${hotel.rating.toStringAsFixed(1)} (${hotel.reviewsCount})',style:const TextStyle(color:AppColors.warning,fontSize:12)),Text('${hotel.minimumPricePerNight ~/ 1000} ألف د.ع',style:const TextStyle(color:AppColors.primary,fontWeight:FontWeight.bold))]) )])));
-  Widget _skeleton()=>ListView(padding:const EdgeInsets.all(20),children:List.generate(6,(_)=>Container(height:100,margin:const EdgeInsets.only(bottom:16),decoration:BoxDecoration(color:Colors.white,borderRadius:BorderRadius.circular(20))));
-  Widget _error()=>Center(child:FilledButton(onPressed:viewModel.load,child:const Text('إعادة المحاولة')));
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+  @override
+  State<HomePage> createState() => _HomePageState();
 }
-class _SearchLine extends StatelessWidget { const _SearchLine(this.icon,this.label); final IconData icon; final String label; @override Widget build(BuildContext context)=>Row(children:[Icon(icon,color:AppColors.primary),const SizedBox(width:8),Text(label,style:const TextStyle(color:AppColors.muted))]); }
+
+class _HomePageState extends State<HomePage> {
+  late final HomeViewModel vm;
+  @override
+  void initState() {
+    super.initState();
+    vm = HomeViewModel(AppDependencies.hotels)..load();
+  }
+
+  @override
+  void dispose() {
+    vm.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+      animation: vm,
+      builder: (_, __) => Scaffold(
+          appBar: AppBar(title: const Text('حجوزاتي')),
+          body: vm.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : ListView(padding: const EdgeInsets.all(16), children: [
+                  const Text('مرحباً أحمد',
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+                  const Text('إلى أين ستكون رحلتك القادمة؟'),
+                  const SizedBox(height: 18),
+                  Card(
+                      child: ListTile(
+                          leading: const Icon(Icons.explore),
+                          title: const Text('اكتشف العراق'),
+                          subtitle: const Text('وجهات وتجارب عراقية مميزة'),
+                          onTap: () =>
+                              Navigator.pushNamed(context, AppRoutes.explore))),
+                  Card(
+                      child: ListTile(
+                          leading: const Icon(Icons.location_on),
+                          title: const Text('فنادق قريبة منك'),
+                          subtitle: const Text('استخدم موقعك عند الطلب فقط'),
+                          onTap: () =>
+                              Navigator.pushNamed(context, AppRoutes.nearby))),
+                  const SizedBox(height: 16),
+                  const Text('إقامات مميزة',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  ...vm.featured.map((hotel) => Card(
+                      child: ListTile(
+                          title: Text(hotel.nameAr),
+                          subtitle: Text(hotel.province.nameAr),
+                          trailing: Text(
+                              '${hotel.minimumPricePerNight ~/ 1000} ألف'))))
+                ])));
+}

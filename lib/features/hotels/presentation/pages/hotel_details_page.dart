@@ -1,14 +1,70 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../domain/entities/hotel.dart';
 import '../../domain/repositories/hotel_repository.dart';
 import '../viewmodels/hotel_details_view_model.dart';
 
-class HotelDetailsPage extends StatefulWidget { const HotelDetailsPage({required this.hotelId,required this.repository,super.key}); final String hotelId; final HotelRepository repository; @override State<HotelDetailsPage> createState()=>_HotelDetailsPageState(); }
-class _HotelDetailsPageState extends State<HotelDetailsPage> { late final HotelDetailsViewModel vm; bool expanded=false; @override void initState(){super.initState();vm=HotelDetailsViewModel(widget.repository,widget.hotelId)..load();} @override void dispose(){vm.dispose();super.dispose();}
-  @override Widget build(BuildContext context)=>AnimatedBuilder(animation:vm,builder:(context,_)=>Scaffold(bottomNavigationBar:vm.state is HotelDetailsSuccess?_booking((vm.state as HotelDetailsSuccess).hotel):null,body:SafeArea(child:switch(vm.state){HotelDetailsLoading()=>_skeleton(),HotelDetailsEmpty()=>_message('الفندق غير موجود'),HotelDetailsError(:final message)=>_message(message,retry:true),HotelDetailsSuccess(:final hotel,:final similar)=>_content(hotel,similar)})));
-  Widget _content(Hotel h,List<Hotel> similar)=>CustomScrollView(slivers:[SliverAppBar(pinned:true,expandedHeight:290,leading:IconButton(onPressed:()=>Navigator.pop(context),icon:const CircleAvatar(child:Icon(Icons.arrow_back))),actions:[IconButton(onPressed:(){},icon:const CircleAvatar(child:Icon(Icons.share_outlined))),IconButton(onPressed:vm.toggleFavorite,icon:CircleAvatar(child:Icon(h.isFavorite?Icons.favorite:Icons.favorite_border,color:AppColors.accent)))],flexibleSpace:FlexibleSpaceBar(background:GestureDetector(onTap:()=>_gallery(h),child:Hero(tag:'hotel-${h.id}',child:Image.network(h.coverImageUrl,fit:BoxFit.cover,errorBuilder:(_,__,___)=>const ColoredBox(color:AppColors.primary))))),),SliverToBoxAdapter(child:Padding(padding:const EdgeInsets.all(20),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text(h.nameAr,style:Theme.of(context).textTheme.headlineSmall),const SizedBox(height:6),Text('${'★'*h.stars}  ${h.rating.toStringAsFixed(1)} (${h.reviewsCount} مراجعة)',style:const TextStyle(color:AppColors.warning)),Text('${h.province.nameAr}، ${h.addressAr}',style:const TextStyle(color:AppColors.muted)),const SizedBox(height:12),if(h.discountPercentage!=null)Chip(label:Text('خصم ${h.discountPercentage}%')),Text('${h.minimumPricePerNight ~/1000} ألف د.ع / ليلة',style:const TextStyle(color:AppColors.primary,fontWeight:FontWeight.bold,fontSize:18)),const SizedBox(height:20),_title('الصور'),SizedBox(height:88,child:ListView.separated(scrollDirection:Axis.horizontal,itemCount:h.imageUrls.length,separatorBuilder:(_,__)=>const SizedBox(width:8),itemBuilder:(_,i)=>GestureDetector(onTap:()=>_gallery(h,i),child:ClipRRect(borderRadius:BorderRadius.circular(12),child:Image.network(h.imageUrls[i],width:120,fit:BoxFit.cover))))),const SizedBox(height:20),_title('عن الفندق'),AnimatedCrossFade(firstChild:Text(h.descriptionAr,maxLines:3,overflow:TextOverflow.ellipsis),secondChild:Text(h.descriptionAr),crossFadeState:expanded?CrossFadeState.showSecond:CrossFadeState.showFirst,duration:const Duration(milliseconds:250)),TextButton(onPressed:()=>setState(()=>expanded=!expanded),child:Text(expanded?'عرض أقل':'اقرأ المزيد')), _title('المرافق'),Wrap(spacing:8,runSpacing:8,children:h.amenities.map((a)=>Chip(avatar:Icon(_amenityIcon(a),size:18),label:Text(_amenityName(a)))).toList()),_title('أنواع الغرف'),...h.roomTypes.map(_room),_title('أوقات الإقامة والسياسات'),_policies(h.policies),_title('الموقع'),Card(child:const SizedBox(height:130,child:Center(child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[Icon(Icons.map_outlined,color:AppColors.primary,size:36),Text('خريطة الموقع ستكون متاحة قريباً')])))),_title('تقييمات الضيوف'),const Card(child:ListTile(leading:CircleAvatar(child:Text('م')),title:Text('إقامة مريحة وخدمة ممتازة'),subtitle:Text('بيانات تقييم تجريبية'))),if(similar.isNotEmpty)...[_title('فنادق مشابهة'),SizedBox(height:190,child:ListView.separated(scrollDirection:Axis.horizontal,itemCount:similar.length,separatorBuilder:(_,__)=>const SizedBox(width:10),itemBuilder:(_,i)=>SizedBox(width:170,child:Card(child:Padding(padding:const EdgeInsets.all(10),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[const Expanded(child:Icon(Icons.hotel,size:56,color:AppColors.primary)),Text(similar[i].nameAr,maxLines:1,overflow:TextOverflow.ellipsis),Text('${similar[i].minimumPricePerNight ~/1000} ألف د.ع',style:const TextStyle(color:AppColors.primary))])))))] ]))) ]);
-  Widget _title(String text)=>Padding(padding:const EdgeInsets.only(top:12,bottom:8),child:Text(text,style:Theme.of(context).textTheme.titleLarge)); Widget _room(RoomType r)=>Card(child:ListTile(title:Text(r.nameAr),subtitle:Text('${r.capacityAdults} بالغين · ${r.availableRooms} غرف متاحة'),trailing:Text('${r.pricePerNight ~/1000} ألف',style:const TextStyle(color:AppColors.primary)))); Widget _policies(HotelPolicies p)=>Card(child:Padding(padding:const EdgeInsets.all(14),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text('الدخول: من ${p.checkInFrom} · الخروج: حتى ${p.checkOutUntil}'),Text('الأطفال: ${p.childrenAllowed?'مسموح':'غير مسموح'} · التدخين: ${p.smokingAllowed?'مسموح':'غير مسموح'}'),Text('الحيوانات: ${p.petsAllowed?'مسموح':'غير مسموح'}'),Text(p.cancellationSummary)]))); Widget _booking(Hotel h)=>SafeArea(child:Material(elevation:8,child:Padding(padding:const EdgeInsets.all(14),child:Row(children:[Expanded(child:Text('${h.minimumPricePerNight ~/1000} ألف د.ع\nلليلة',style:const TextStyle(fontWeight:FontWeight.bold))),FilledButton(onPressed:(){},child:const Text('احجز الآن'))]))));
-  Widget _skeleton()=>const Center(child:CircularProgressIndicator()); Widget _message(String m,{bool retry=false})=>Center(child:Column(mainAxisSize:MainAxisSize.min,children:[const Icon(Icons.hotel_outlined,size:54,color:AppColors.muted),Text(m),if(retry)FilledButton(onPressed:vm.load,child:const Text('إعادة المحاولة'))])); void _gallery(Hotel h,[int page=0])=>Navigator.push(context,MaterialPageRoute(builder:(_)=>_Gallery(images:h.imageUrls,initial:page))); IconData _amenityIcon(HotelAmenity a)=>switch(a){HotelAmenity.wifi=>Icons.wifi,HotelAmenity.parking=>Icons.local_parking,HotelAmenity.pool=>Icons.pool,HotelAmenity.restaurant=>Icons.restaurant,HotelAmenity.gym=>Icons.fitness_center,HotelAmenity.roomService=>Icons.room_service,HotelAmenity.reception24h=>Icons.support_agent,HotelAmenity.airConditioning=>Icons.ac_unit,HotelAmenity.elevator=>Icons.elevator,HotelAmenity.airportShuttle=>Icons.airport_shuttle,HotelAmenity.familyFriendly=>Icons.family_restroom,HotelAmenity.generator=>Icons.power,HotelAmenity.housekeeping=>Icons.cleaning_services,HotelAmenity.accessible=>Icons.accessible}; String _amenityName(HotelAmenity a)=>switch(a){HotelAmenity.wifi=>'واي فاي',HotelAmenity.parking=>'موقف سيارات',HotelAmenity.pool=>'مسبح',HotelAmenity.restaurant=>'مطعم',HotelAmenity.gym=>'صالة رياضية',HotelAmenity.roomService=>'خدمة غرف',HotelAmenity.reception24h=>'استقبال 24 ساعة',HotelAmenity.airConditioning=>'تكييف',HotelAmenity.elevator=>'مصعد',HotelAmenity.airportShuttle=>'نقل للمطار',HotelAmenity.familyFriendly=>'عائلات',HotelAmenity.generator=>'مولد كهرباء',HotelAmenity.housekeeping=>'تنظيف',HotelAmenity.accessible=>'مناسب لذوي الإعاقة'};
+class HotelDetailsPage extends StatefulWidget {
+  const HotelDetailsPage(
+      {super.key, required this.hotelId, required this.repository});
+  final String hotelId;
+  final HotelRepository repository;
+  @override
+  State<HotelDetailsPage> createState() => _HotelDetailsPageState();
 }
-class _Gallery extends StatefulWidget { const _Gallery({required this.images,required this.initial}); final List<String> images; final int initial; @override State<_Gallery> createState()=>_GalleryState(); } class _GalleryState extends State<_Gallery>{late final PageController controller; int page=0; @override void initState(){super.initState();page=widget.initial;controller=PageController(initialPage:page);} @override Widget build(BuildContext context)=>Scaffold(backgroundColor:Colors.black,appBar:AppBar(backgroundColor:Colors.black,foregroundColor:Colors.white,title:Text('${page+1}/${widget.images.length}')),body:PageView.builder(controller:controller,onPageChanged:(v)=>setState(()=>page=v),itemCount:widget.images.length,itemBuilder:(_,i)=>InteractiveViewer(child:Center(child:Image.network(widget.images[i]))));}
+
+class _HotelDetailsPageState extends State<HotelDetailsPage> {
+  late final HotelDetailsViewModel vm;
+  @override
+  void initState() {
+    super.initState();
+    vm = HotelDetailsViewModel(widget.repository, widget.hotelId)..load();
+  }
+
+  @override
+  void dispose() {
+    vm.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation: vm,
+        builder: (_, __) => Scaffold(
+            appBar: AppBar(title: const Text('تفاصيل الفندق')), body: _body()),
+      );
+  Widget _body() {
+    final state = vm.state;
+    if (state is HotelDetailsLoading)
+      return const Center(child: CircularProgressIndicator());
+    if (state is HotelDetailsEmpty)
+      return const Center(child: Text('الفندق غير موجود'));
+    if (state is HotelDetailsError) return Center(child: Text(state.message));
+    final success = state as HotelDetailsSuccess;
+    final hotel = success.hotel;
+    return ListView(padding: const EdgeInsets.all(16), children: [
+      AspectRatio(
+          aspectRatio: 1.7,
+          child: Image.network(hotel.coverImageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) =>
+                  const ColoredBox(color: AppColors.primary))),
+      const SizedBox(height: 12),
+      Text(hotel.nameAr, style: Theme.of(context).textTheme.headlineSmall),
+      Text('${hotel.province.nameAr} · ${hotel.rating.toStringAsFixed(1)} ★'),
+      Text('${hotel.minimumPricePerNight ~/ 1000} ألف د.ع / ليلة'),
+      const SizedBox(height: 12),
+      Text(hotel.descriptionAr),
+      Wrap(
+          spacing: 8,
+          children: hotel.amenities
+              .map((item) => Chip(label: Text(item.name)))
+              .toList()),
+      if (success.similar.isNotEmpty) ...[
+        const SizedBox(height: 20),
+        const Text('فنادق مشابهة'),
+        ...success.similar.map((item) => ListTile(
+            title: Text(item.nameAr), subtitle: Text(item.province.nameAr)))
+      ],
+    ]);
+  }
+}

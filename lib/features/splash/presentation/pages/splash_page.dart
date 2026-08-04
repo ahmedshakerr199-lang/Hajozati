@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../home/presentation/pages/home_page.dart';
+import '../../../../app/navigation/app_routes.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -26,13 +26,7 @@ class _SplashPageState extends State<SplashPage>
     )..forward();
     Timer(const Duration(milliseconds: 2400), () {
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            pageBuilder: (_, animation, __) => const HomePage(),
-            transitionsBuilder: (_, animation, __, child) =>
-                FadeTransition(opacity: animation, child: child),
-          ),
-        );
+        Navigator.of(context).pushReplacementNamed(AppRoutes.home);
       }
     });
   }
@@ -59,10 +53,12 @@ class _SplashPageState extends State<SplashPage>
             const _DecorativeWaves(),
             Center(
               child: FadeTransition(
-                opacity: CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+                opacity:
+                    CurvedAnimation(parent: _controller, curve: Curves.easeOut),
                 child: ScaleTransition(
                   scale: Tween<double>(begin: .78, end: 1).animate(
-                    CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
+                    CurvedAnimation(
+                        parent: _controller, curve: Curves.elasticOut),
                   ),
                   child: const Column(
                     mainAxisSize: MainAxisSize.min,
@@ -80,7 +76,8 @@ class _SplashPageState extends State<SplashPage>
                       SizedBox(height: 8),
                       Text(
                         AppStrings.tagline,
-                        style: TextStyle(color: Color(0xFFD7F7F1), fontSize: 16),
+                        style:
+                            TextStyle(color: Color(0xFFD7F7F1), fontSize: 16),
                       ),
                     ],
                   ),
@@ -95,7 +92,8 @@ class _SplashPageState extends State<SplashPage>
                 child: SizedBox(
                   width: 28,
                   height: 28,
-                  child: CircularProgressIndicator(color: Colors.white70, strokeWidth: 2.5),
+                  child: CircularProgressIndicator(
+                      color: Colors.white70, strokeWidth: 2.5),
                 ),
               ),
             ),
@@ -118,7 +116,8 @@ class _CompassLogo extends StatelessWidget {
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white54, width: 1.5),
         ),
-        child: const Icon(Icons.explore_rounded, size: 60, color: AppColors.gold),
+        child:
+            const Icon(Icons.explore_rounded, size: 60, color: AppColors.gold),
       );
 }
 

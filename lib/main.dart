@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/theme/app_theme.dart';
+import 'app/navigation/app_router.dart';
 import 'features/splash/presentation/pages/splash_page.dart';
 
 void main() {
@@ -30,6 +31,7 @@ class HajozatiApp extends StatelessWidget {
         child: child ?? const SizedBox.shrink(),
       ),
       home: const SplashPage(),
+      onGenerateRoute: AppRouter.onGenerateRoute,
     );
   }
 }
