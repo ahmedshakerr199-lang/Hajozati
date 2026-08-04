@@ -154,9 +154,27 @@ abstract final class MockHotelDataSource {
               petsAllowed: false,
               smokingAllowed: false,
               cancellationSummary: 'إلغاء مجاني حتى 24 ساعة قبل الوصول.'),
-          latitude: 33.30 + (index % 5) * .015,
-          longitude: 44.38 + (index % 5) * .018,
+          latitude: _coordinates(province.id, index).$1,
+          longitude: _coordinates(province.id, index).$2,
           discountPercentage: index % 5 == 0 ? 15 : null,
         );
       });
+}
+
+(double, double) _coordinates(String province, int index) {
+  final center = switch (province) {
+    'baghdad' => (33.3152, 44.3661),
+    'basra' => (30.5085, 47.7804),
+    'nineveh' => (36.3456, 43.1575),
+    'erbil' => (36.1911, 44.0092),
+    'sulaymaniyah' => (35.5613, 45.4309),
+    'duhok' => (36.8671, 42.9885),
+    'kirkuk' => (35.4681, 44.3922),
+    'dhi-qar' => (31.0439, 46.2573),
+    'najaf' => (32.0000, 44.3300),
+    'karbala' => (32.6160, 44.0249),
+    _ => (33.3152, 44.3661),
+  };
+  final offset = (index % 4) * .008;
+  return (center.$1 + offset, center.$2 - offset);
 }

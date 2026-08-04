@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../app/app_dependencies.dart';
+import '../../../../app/navigation/app_routes.dart';
 import '../../domain/nearby_hotels.dart';
 import '../viewmodels/nearby_hotels_view_model.dart';
 
@@ -31,7 +32,9 @@ class _NearbyHotelsPageState extends State<NearbyHotelsPage> {
   Widget build(BuildContext context) => AnimatedBuilder(
       animation: vm,
       builder: (_, __) => Scaffold(
-          appBar: AppBar(title: const Text('فنادق قريبة منك')),
+          appBar: AppBar(title: const Text('فنادق قريبة منك'), actions: [
+            IconButton(onPressed: vm.load, icon: const Icon(Icons.my_location))
+          ]),
           body: switch (vm.state) {
             NearbyViewState.loading =>
               const Center(child: CircularProgressIndicator()),
@@ -40,48 +43,49 @@ class _NearbyHotelsPageState extends State<NearbyHotelsPage> {
                 'نحتاج إذن الموقع لعرض الفنادق القريبة.',
                 'السماح بالموقع',
                 vm.requestPermission),
+            NearbyViewState.permanentlyDenied => _action(
+                'تم رفض إذن الموقع بشكل دائم.',
+                'فتح إعدادات التطبيق',
+                vm.openSettings),
             NearbyViewState.serviceDisabled => _action('خدمة الموقع متوقفة.',
                 'فتح الإعدادات', vm.openLocationSettings),
+            NearbyViewState.locationUnavailable =>
+              _action('تعذر تحديد الموقع.', 'إعادة المحاولة', vm.load),
             NearbyViewState.error =>
               _action(vm.message ?? 'تعذر التحميل.', 'إعادة المحاولة', vm.load),
             NearbyViewState.idle => const SizedBox.shrink()
           }));
-  Widget _list() => Column(children: [
+  Widget _list() => ListView(children: [
         Wrap(
             spacing: 6,
             children: NearbyRange.values
-                .map((value) => ChoiceChip(
-                    label: Text(_label(value)),
-                    selected: vm.range == value,
-                    onSelected: (_) => vm.setRange(value)))
+                .map((x) => ChoiceChip(
+                    label: Text(x.name),
+                    selected: vm.range == x,
+                    onSelected: (_) => vm.setRange(x)))
                 .toList()),
-        Expanded(
-            child: vm.hotels.isEmpty
-                ? const Center(child: Text('لا توجد فنادق ضمن هذا النطاق.'))
-                : ListView.builder(
-                    itemCount: vm.hotels.length,
-                    itemBuilder: (_, index) {
-                      final item = vm.hotels[index];
-                      return ListTile(
-                          leading: const CircleAvatar(child: Icon(Icons.hotel)),
-                          title: Text(item.hotel.nameAr),
-                          subtitle: Text(item.hotel.province.nameAr),
-                          trailing:
-                              Text('${item.distanceKm.toStringAsFixed(1)} كم'));
-                    }))
+        ...vm.hotels.map((item) => ListTile(
+            onTap: () => Navigator.pushNamed(context, AppRoutes.hotelDetails,
+                arguments: item.hotel.id),
+            leading: const CircleAvatar(child: Icon(Icons.hotel)),
+            title: Text(item.hotel.nameAr),
+            subtitle: Text(item.hotel.province.nameAr),
+            trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+              Text(item.distanceKm < 1
+                  ? '${(item.distanceKm * 1000).round()} م'
+                  : '${item.distanceKm.toStringAsFixed(1)} كم'),
+              IconButton(
+                  onPressed: () => AppDependencies.hotels
+                      .setFavorite(item.hotel.id, !item.hotel.isFavorite),
+                  icon: Icon(item.hotel.isFavorite
+                      ? Icons.favorite
+                      : Icons.favorite_border))
+            ])))
       ]);
   Widget _action(String text, String label, Future<void> Function() action) =>
       Center(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
         Text(text),
-        const SizedBox(height: 12),
         FilledButton(onPressed: action, child: Text(label))
       ]));
-  String _label(NearbyRange value) => switch (value) {
-        NearbyRange.all => 'الكل',
-        NearbyRange.km5 => '5 كم',
-        NearbyRange.km10 => '10 كم',
-        NearbyRange.km25 => '25 كم',
-        NearbyRange.km50 => '50 كم'
-      };
 }

@@ -9,7 +9,9 @@ enum NearbyViewState {
   loading,
   success,
   permissionDenied,
+  permanentlyDenied,
   serviceDisabled,
+  locationUnavailable,
   error
 }
 
@@ -33,12 +35,26 @@ class NearbyHotelsViewModel extends ChangeNotifier {
     message = null;
     notifyListeners();
     final enabled = await _location.isLocationServiceEnabled();
+    if (enabled case AppFailure(error: final failure)) {
+      _setError(failure);
+      return;
+    }
     if (enabled case AppSuccess(data: false)) {
       state = NearbyViewState.serviceDisabled;
       notifyListeners();
       return;
     }
     final permission = await _location.checkPermission();
+    if (permission case AppFailure(error: final failure)) {
+      _setError(failure);
+      return;
+    }
+    if (permission
+        case AppSuccess(data: LocationPermissionStatus.permanentlyDenied)) {
+      state = NearbyViewState.permanentlyDenied;
+      notifyListeners();
+      return;
+    }
     if (permission case AppSuccess(data: final value)
         when value != LocationPermissionStatus.granted) {
       state = NearbyViewState.permissionDenied;
@@ -61,7 +77,11 @@ class NearbyHotelsViewModel extends ChangeNotifier {
   }
 
   Future<void> requestPermission() async {
-    await _location.requestPermission();
+    final result = await _location.requestPermission();
+    if (result case AppFailure(error: final error)) {
+      _setError(error);
+      return;
+    }
     await load();
   }
 

@@ -8,6 +8,8 @@ abstract interface class ExploreIraqRepository {
   Stream<List<TouristDestination>> observeFeaturedDestinations();
   Stream<List<TouristDestination>> observePopularDestinations();
   Future<AppResult<List<TouristDestination>>> searchDestinations(String query);
+  Future<AppResult<List<TouristDestination>>> destinationsByProvince(
+      String provinceId);
   Future<AppResult<List<TouristDestination>>> destinationsByCategory(
       DestinationCategory category);
   Future<AppResult<TouristDestination>> getDestinationById(String id);
