@@ -5,12 +5,35 @@ import 'package:hajozati/core/result/app_result.dart';
 import 'package:hajozati/features/booking/presentation/room_selection_page.dart';
 
 void main() {
-  testWidgets('uses booking id to load its shared draft', (t) async {
+  Future<String> createId() async {
     final result =
-        await AppDependencies.bookingFlow.createDraftForHotel('room-page');
-    final id = ((result as AppSuccess).data).booking!.id;
-    await t.pumpWidget(MaterialApp(home: RoomSelectionPage(bookingId: id)));
-    await t.pump();
+        await AppDependencies.bookingFlow.createDraftForHotel('hotel-1');
+    return ((result as AppSuccess).data).booking!.id;
+  }
+
+  testWidgets('loads actual hotel room types using booking id only',
+      (tester) async {
+    final id = await createId();
+    await tester
+        .pumpWidget(MaterialApp(home: RoomSelectionPage(bookingId: id)));
+    await tester.pumpAndSettle();
     expect(find.byType(RoomSelectionPage), findsOneWidget);
+    expect(find.byType(ListTile), findsWidgets);
+  });
+
+  testWidgets('unknown booking id shows an error state', (tester) async {
+    await tester.pumpWidget(
+        const MaterialApp(home: RoomSelectionPage(bookingId: 'unknown')));
+    await tester.pumpAndSettle();
+    expect(find.text('تعذر تحميل مسودة الحجز.'), findsOneWidget);
+  });
+
+  test('coordinator reuses view model for the same booking id', () async {
+    final id = await createId();
+    final first =
+        await AppDependencies.bookingFlow.getOrCreateBookingViewModel(id);
+    final second =
+        await AppDependencies.bookingFlow.getOrCreateBookingViewModel(id);
+    expect((first as AppSuccess).data, same((second as AppSuccess).data));
   });
 }
