@@ -6,6 +6,7 @@ import '../../features/hotels/presentation/pages/hotel_details_page.dart';
 import '../app_dependencies.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/nearby/presentation/pages/nearby_hotels_page.dart';
+import '../../features/search/presentation/search_page.dart';
 import 'app_routes.dart';
 
 /// Central, ID-only route table. Detail routes can be extended for deep links.
@@ -18,6 +19,8 @@ abstract final class AppRouter {
             builder: (_) => const ExploreIraqPage(), settings: settings),
         AppRoutes.nearby => MaterialPageRoute(
             builder: (_) => const NearbyHotelsPage(), settings: settings),
+        AppRoutes.search => MaterialPageRoute(
+            builder: (_) => const SearchPage(), settings: settings),
         AppRoutes.hotelDetails when settings.arguments is String =>
           MaterialPageRoute(
               builder: (_) => HotelDetailsPage(
