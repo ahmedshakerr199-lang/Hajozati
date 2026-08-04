@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../app/app_dependencies.dart';
 import '../../../../app/navigation/app_routes.dart';
+import '../../../../core/result/app_result.dart';
 import '../../domain/nearby_hotels.dart';
 import '../viewmodels/nearby_hotels_view_model.dart';
 

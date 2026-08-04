@@ -16,6 +16,7 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
+  Timer? _navigationTimer;
 
   @override
   void initState() {
@@ -24,7 +25,7 @@ class _SplashPageState extends State<SplashPage>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     )..forward();
-    Timer(const Duration(milliseconds: 2400), () {
+    _navigationTimer = Timer(const Duration(milliseconds: 2400), () {
       if (mounted) {
         Navigator.of(context).pushReplacementNamed(AppRoutes.home);
       }
@@ -33,6 +34,7 @@ class _SplashPageState extends State<SplashPage>
 
   @override
   void dispose() {
+    _navigationTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -45,7 +47,7 @@ class _SplashPageState extends State<SplashPage>
           gradient: LinearGradient(
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
-            colors: [AppColors.navy, AppColors.deepBlue, AppColors.ocean],
+            colors: [AppColors.primary, AppColors.text, AppColors.accent],
           ),
         ),
         child: Stack(
@@ -116,8 +118,8 @@ class _CompassLogo extends StatelessWidget {
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white54, width: 1.5),
         ),
-        child:
-            const Icon(Icons.explore_rounded, size: 60, color: AppColors.gold),
+        child: const Icon(Icons.explore_rounded,
+            size: 60, color: AppColors.warning),
       );
 }
 

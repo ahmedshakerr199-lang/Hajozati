@@ -29,7 +29,7 @@ class MockExploreRepository implements ExploreIraqRepository {
   Future<AppResult<List<TouristDestination>>> searchDestinations(
       String query) async {
     final normalized = query.trim().toLowerCase();
-    if (normalized.isEmpty) return const AppSuccess(MockDestinations.data);
+    if (normalized.isEmpty) return AppSuccess(MockDestinations.data);
     return AppSuccess(MockDestinations.data
         .where((item) => '${item.nameAr} ${item.nameEn} ${item.cityAr}'
             .toLowerCase()

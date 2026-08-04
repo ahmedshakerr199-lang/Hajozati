@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/app_dependencies.dart';
 import '../../../../app/navigation/app_routes.dart';
+import '../../../../core/location/location_service.dart';
 import '../../../../core/result/app_result.dart';
 import '../../../nearby/domain/nearby_hotels.dart';
 import '../../domain/entities/tourist_destination.dart';
