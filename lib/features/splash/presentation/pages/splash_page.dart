@@ -114,7 +114,7 @@ class _CompassLogo extends StatelessWidget {
         width: 106,
         height: 106,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(.14),
+          color: Colors.white.withValues(alpha: .14),
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white54, width: 1.5),
         ),
@@ -134,7 +134,7 @@ class _DecorativeWaves extends StatelessWidget {
         child: Container(
           height: 230,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(.08),
+            color: Colors.white.withValues(alpha: .08),
             borderRadius: BorderRadius.circular(160),
           ),
         ),

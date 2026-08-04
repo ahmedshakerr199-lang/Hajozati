@@ -97,8 +97,9 @@ class NearbyHotelsViewModel extends ChangeNotifier {
   Future<AppResult<void>> toggleFavorite(String hotelId) async {
     try {
       final index = allHotels.indexWhere((item) => item.hotel.id == hotelId);
-      if (index < 0)
+      if (index < 0) {
         return const AppFailure(NotFoundAppError('الفندق غير موجود.'));
+      }
       final old = allHotels[index];
       await _hotels.setFavorite(hotelId, !old.hotel.isFavorite);
       allHotels = List.of(allHotels)

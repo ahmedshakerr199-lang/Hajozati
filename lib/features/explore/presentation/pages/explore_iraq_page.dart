@@ -39,14 +39,17 @@ class _ExploreIraqPageState extends State<ExploreIraqPage> {
       builder: (_, __) => Scaffold(
           appBar: AppBar(title: const Text('اكتشف العراق')), body: _body()));
   Widget _body() {
-    if (vm.state == ExploreState.loading)
+    if (vm.state == ExploreState.loading) {
       return const Center(child: CircularProgressIndicator());
-    if (vm.state == ExploreState.error)
+    }
+    if (vm.state == ExploreState.error) {
       return Center(
           child: FilledButton(
               onPressed: vm.load, child: const Text('إعادة المحاولة')));
-    if (vm.state == ExploreState.empty)
+    }
+    if (vm.state == ExploreState.empty) {
       return const Center(child: Text('لا توجد وجهات مطابقة.'));
+    }
     return ListView(padding: const EdgeInsets.all(16), children: [
       TextField(
           onChanged: vm.search,
@@ -55,7 +58,7 @@ class _ExploreIraqPageState extends State<ExploreIraqPage> {
               hintText: 'ابحث بالعربية أو الإنجليزية')),
       const SizedBox(height: 12),
       DropdownButtonFormField<String>(
-          value: vm.selectedProvince,
+          initialValue: vm.selectedProvince,
           decoration: const InputDecoration(labelText: 'المحافظة'),
           hint: const Text('جميع المحافظات'),
           items: [

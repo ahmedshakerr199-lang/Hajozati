@@ -79,9 +79,10 @@ class _NearbyHotelsPageState extends State<NearbyHotelsPage> {
               IconButton(
                   onPressed: () async {
                     final result = await vm.toggleFavorite(item.hotel.id);
-                    if (result is AppFailure<void> && mounted)
+                    if (result is AppFailure<void> && mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(result.error.message)));
+                    }
                   },
                   icon: Icon(item.hotel.isFavorite
                       ? Icons.favorite

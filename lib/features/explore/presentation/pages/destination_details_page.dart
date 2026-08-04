@@ -57,8 +57,9 @@ class _DestinationDetailsPageState extends State<DestinationDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final result = _result;
-    if (result == null)
+    if (result == null) {
       return const Scaffold(body: Center(child: _DetailsSkeleton()));
+    }
     if (result is AppFailure<TouristDestination>) {
       final notFound = result.error is NotFoundAppError;
       return Scaffold(

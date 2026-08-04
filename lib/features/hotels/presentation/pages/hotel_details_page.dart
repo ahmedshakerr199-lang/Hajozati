@@ -34,10 +34,12 @@ class _HotelDetailsPageState extends State<HotelDetailsPage> {
       );
   Widget _body() {
     final state = vm.state;
-    if (state is HotelDetailsLoading)
+    if (state is HotelDetailsLoading) {
       return const Center(child: CircularProgressIndicator());
-    if (state is HotelDetailsEmpty)
+    }
+    if (state is HotelDetailsEmpty) {
       return const Center(child: Text('الفندق غير موجود'));
+    }
     if (state is HotelDetailsError) return Center(child: Text(state.message));
     final success = state as HotelDetailsSuccess;
     final hotel = success.hotel;
