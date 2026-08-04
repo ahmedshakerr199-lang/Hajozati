@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../app/app_dependencies.dart';
+import '../../../../app/navigation/app_routes.dart';
+import '../../../../core/result/app_result.dart';
+import '../../../booking/presentation/booking_view_model.dart';
 import '../../domain/repositories/hotel_repository.dart';
 import '../viewmodels/hotel_details_view_model.dart';
 
@@ -56,6 +60,27 @@ class _HotelDetailsPageState extends State<HotelDetailsPage> {
       Text('${hotel.minimumPricePerNight ~/ 1000} ألف د.ع / ليلة'),
       const SizedBox(height: 12),
       Text(hotel.descriptionAr),
+      FilledButton(
+          onPressed: () async {
+            final result =
+                await AppDependencies.bookingFlow.createDraftForHotel(hotel.id);
+            if (!mounted) return;
+            switch (result) {
+              case AppSuccess<BookingViewModel>(data: final viewModel):
+                final bookingId = viewModel.booking?.id;
+                if (bookingId == null || bookingId.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('تعذر إنشاء مسودة الحجز.')));
+                  return;
+                }
+                Navigator.pushNamed(context, AppRoutes.roomSelection,
+                    arguments: bookingId);
+              case AppFailure<BookingViewModel>(error: final error):
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text(error.message)));
+            }
+          },
+          child: const Text('احجز الآن')),
       Wrap(
           spacing: 8,
           children: hotel.amenities
