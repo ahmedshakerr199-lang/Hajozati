@@ -7,6 +7,9 @@ import 'features/splash/presentation/pages/splash_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  // Bound decoded-image memory while thumbnail cache sizes preserve scroll reuse.
+  PaintingBinding.instance.imageCache.maximumSize = 250;
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 60 << 20;
   runApp(const HajozatiApp());
 }
 

@@ -18,7 +18,9 @@ void main() {
         .pumpWidget(MaterialApp(home: RoomSelectionPage(bookingId: id)));
     await tester.pumpAndSettle();
     expect(find.byType(RoomSelectionPage), findsOneWidget);
-    expect(find.byType(ListTile), findsWidgets);
+    expect(find.text('غرفة قياسية'), findsOneWidget);
+    expect(find.textContaining('السعة:'), findsWidgets);
+    expect(find.textContaining('د.ع / ليلة'), findsWidgets);
   });
 
   testWidgets('unknown booking id shows an error state', (tester) async {

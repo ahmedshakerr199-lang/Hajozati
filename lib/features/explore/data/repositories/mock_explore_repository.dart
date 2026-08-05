@@ -77,12 +77,14 @@ class MockExploreRepository implements ExploreIraqRepository {
     if (result case AppFailure(error: final error)) return AppFailure(error);
     final destination = (result as AppSuccess<TouristDestination>).data;
     final hotels = await _hotels.watchHotels().first;
-    final nearby = hotels.where((hotel) => hotel.hasValidCoordinates).toList()
+    final hotelsByDistance = hotels
+        .where((hotel) => hotel.hasValidCoordinates)
+        .toList()
       ..sort((a, b) => _distance(destination.latitude, destination.longitude,
               a.latitude, a.longitude)
           .compareTo(_distance(destination.latitude, destination.longitude,
               b.latitude, b.longitude)));
-    return AppSuccess(nearby.take(8).toList(growable: false));
+    return AppSuccess(hotelsByDistance.take(8).toList(growable: false));
   }
 
   double _distance(double aLat, double aLng, double bLat, double bLng) {

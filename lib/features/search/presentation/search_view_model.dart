@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import '../domain/search_models.dart';
 import '../domain/search_use_cases.dart';
 import '../domain/search_repository.dart';
+import '../domain/hotel_search_criteria.dart';
 import '../../hotels/domain/entities/hotel.dart';
 
 enum SearchState { idle, loading, success, empty, error }
@@ -21,14 +24,30 @@ class SearchViewModel extends ChangeNotifier {
   List<Hotel> results = const [];
   List<String> recent = const [], suggestions = const [];
   String? error;
+  Timer? _searchDebounce;
+  int _requestVersion = 0;
+
+  /// Debounces keyboard input while keeping [search] directly testable.
+  void scheduleSearch(String value) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 250), () {
+      search(value);
+    });
+  }
+
   Future<void> search(String value) async {
+    final requestVersion = ++_requestVersion;
     query = value;
     state = SearchState.loading;
     notifyListeners();
     try {
-      suggestions = await _suggestions(value);
+      final nextSuggestions = await _suggestions(value);
       final result =
           await _search(SearchQuery(text: value, filter: filter, sort: sort));
+      if (requestVersion != _requestVersion) {
+        return;
+      }
+      suggestions = nextSuggestions;
       results = result.hotels;
       state = results.isEmpty ? SearchState.empty : SearchState.success;
       if (value.trim().isNotEmpty) {
@@ -36,6 +55,9 @@ class SearchViewModel extends ChangeNotifier {
         recent = await _repo.recentSearches();
       }
     } catch (_) {
+      if (requestVersion != _requestVersion) {
+        return;
+      }
       state = SearchState.error;
       error = 'حدث خطأ أثناء البحث.';
     }
@@ -43,6 +65,8 @@ class SearchViewModel extends ChangeNotifier {
   }
 
   Future<void> clear() async {
+    _searchDebounce?.cancel();
+    _requestVersion++;
     query = '';
     results = const [];
     await _clear();
@@ -52,6 +76,13 @@ class SearchViewModel extends ChangeNotifier {
   }
 
   Future<void> retry() => search(query);
+
+  /// Searches using an immutable panel criteria without filtering in widgets.
+  Future<void> searchCriteria(HotelSearchCriteria criteria) async {
+    filter = SearchFilter(provinceId: criteria.provinceId);
+    await search('');
+  }
+
   Future<void> changeFilters(SearchFilter value) async {
     filter = value;
     await search(query);
@@ -60,5 +91,11 @@ class SearchViewModel extends ChangeNotifier {
   Future<void> changeSort(SortOption value) async {
     sort = value;
     await search(query);
+  }
+
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    super.dispose();
   }
 }

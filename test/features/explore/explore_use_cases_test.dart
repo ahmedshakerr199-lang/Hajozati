@@ -12,7 +12,7 @@ void main() {
         DestinationCategory.museum);
     expect((result as AppSuccess).data, isNotEmpty);
   });
-  test('nearby destination hotels are returned', () async {
+  test('destination hotels are returned by distance', () async {
     final result = await GetHotelsNearDestinationUseCase(repo)('ur-ziggurat');
     expect((result as AppSuccess).data, isNotEmpty);
   });

@@ -55,7 +55,6 @@ class MockSearchRepository implements SearchRepository {
         'فنادق البصرة',
         'فنادق النجف',
         'فنادق خمس نجوم',
-        'فنادق قريبة مني',
         'فنادق مناسبة للعائلات'
       ];
   @override

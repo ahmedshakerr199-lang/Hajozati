@@ -1,5 +1,3 @@
-import '../core/location/geolocator_location_service.dart';
-import '../core/location/location_service.dart';
 import '../features/explore/data/repositories/mock_explore_repository.dart';
 import '../features/explore/domain/repositories/explore_iraq_repository.dart';
 import '../features/hotels/data/repositories/mock_hotel_repository.dart';
@@ -19,7 +17,6 @@ class AppDependencies {
 
   static final HotelRepository hotels = MockHotelRepository();
   static final ExploreIraqRepository explore = MockExploreRepository(hotels);
-  static final LocationService location = GeolocatorLocationService();
   static final SearchRepository search = MockSearchRepository(hotels);
   static final BookingRepository bookings = MockBookingRepository();
   static BookingViewModel createBookingViewModel() => BookingViewModel(

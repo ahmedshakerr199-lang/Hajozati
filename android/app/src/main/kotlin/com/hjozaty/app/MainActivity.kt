@@ -1,4 +1,4 @@
-package com.example.hajozati
+package com.hjozaty.app
 
 import io.flutter.embedding.android.FlutterActivity
 

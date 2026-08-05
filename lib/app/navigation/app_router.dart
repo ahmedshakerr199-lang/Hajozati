@@ -5,8 +5,8 @@ import '../../features/explore/presentation/pages/destination_details_page.dart'
 import '../../features/hotels/presentation/pages/hotel_details_page.dart';
 import '../app_dependencies.dart';
 import '../../features/home/presentation/pages/home_page.dart';
-import '../../features/nearby/presentation/pages/nearby_hotels_page.dart';
 import '../../features/search/presentation/search_page.dart';
+import '../../features/search/domain/hotel_search_criteria.dart';
 import '../../features/booking/presentation/room_selection_page.dart';
 import '../../features/booking/presentation/booking_details_page.dart';
 import '../../features/booking/presentation/booking_summary_page.dart';
@@ -21,10 +21,12 @@ abstract final class AppRouter {
             builder: (_) => const HomePage(), settings: settings),
         AppRoutes.explore => MaterialPageRoute(
             builder: (_) => const ExploreIraqPage(), settings: settings),
-        AppRoutes.nearby => MaterialPageRoute(
-            builder: (_) => const NearbyHotelsPage(), settings: settings),
         AppRoutes.search => MaterialPageRoute(
-            builder: (_) => const SearchPage(), settings: settings),
+            builder: (_) => SearchPage(
+                criteria: settings.arguments is HotelSearchCriteria
+                    ? settings.arguments as HotelSearchCriteria
+                    : null),
+            settings: settings),
         AppRoutes.roomSelection when settings.arguments is String =>
           MaterialPageRoute(
               builder: (_) =>

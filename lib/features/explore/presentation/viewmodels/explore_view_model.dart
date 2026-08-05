@@ -24,19 +24,29 @@ class ExploreViewModel extends ChangeNotifier {
   DestinationCategory? selectedCategory;
   String? error;
   List<TouristDestination> _allItems = const [];
-  List<String> get provinces =>
-      _allItems.map((item) => item.provinceId).toSet().toList()..sort();
+  List<String> provinces = const [];
   StreamSubscription<List<TouristDestination>>? _subscription;
+  Timer? _searchDebounce;
+  bool _hasLoaded = false;
+
   Future<void> load() async {
+    if (_hasLoaded) {
+      return;
+    }
+    _hasLoaded = true;
     state = ExploreState.loading;
     notifyListeners();
     _subscription?.cancel();
     _subscription = _all().listen((items) {
       _allItems = items;
       destinations = items;
+      provinces = List.unmodifiable(
+        _allItems.map((item) => item.provinceId).toSet().toList()..sort(),
+      );
       state = items.isEmpty ? ExploreState.empty : ExploreState.success;
       notifyListeners();
     }, onError: (_) {
+      _hasLoaded = false;
       state = ExploreState.error;
       error = 'تعذر تحميل الوجهات.';
       notifyListeners();
@@ -44,6 +54,14 @@ class ExploreViewModel extends ChangeNotifier {
     featured = await _featured().first;
     popular = await _popular().first;
     notifyListeners();
+  }
+
+  /// Debounces text input only; direct [search] remains deterministic for use cases.
+  void scheduleSearch(String value) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 250), () {
+      search(value);
+    });
   }
 
   Future<void> search(String value) async {
@@ -93,6 +111,7 @@ class ExploreViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _subscription?.cancel();
     super.dispose();
   }

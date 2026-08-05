@@ -16,10 +16,6 @@ class PermissionAppError extends AppError {
   const PermissionAppError(super.message);
 }
 
-class LocationServiceDisabledAppError extends AppError {
-  const LocationServiceDisabledAppError(super.message);
-}
-
 class NotFoundAppError extends AppError {
   const NotFoundAppError(super.message);
 }
